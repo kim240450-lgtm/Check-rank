@@ -2,68 +2,97 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Analysis Result | Check Rank</title>
+    <title>Detailed Analysis | Check Rank</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --val-red: #ff4655; --val-black: #0f1923; --val-gray: #1f2326; }
+        :root { --val-red: #ff4655; --val-black: #0f1923; --val-gray: #1f2326; --val-blue: #00eeff; }
         body { margin: 0; background: var(--val-black); color: white; font-family: 'Kanit', sans-serif; padding: 20px; }
-        
         .container { max-width: 900px; margin: 0 auto; }
-        .result-card { background: var(--val-gray); padding: 40px; border-radius: 10px; border-top: 4px solid var(--val-red); margin-bottom: 20px; text-align: center; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .stat-box { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,70,85,0.2); }
-        .stat-label { color: #888; font-size: 14px; text-transform: uppercase; }
+        /* Account Card */
+        .result-card { background: var(--val-gray); padding: 40px; border-radius: 10px; border-top: 4px solid var(--val-red); margin-bottom: 20px; text-align: center; }
+        .rank-img { width: 140px; filter: drop-shadow(0 0 15px var(--val-red)); }
+        .player-name { font-family: 'Oswald'; font-size: 32px; margin: 10px 0; text-transform: uppercase; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .stat-label { color: #888; font-size: 12px; text-transform: uppercase; margin-bottom: 5px; }
         .stat-value { font-family: 'Oswald'; font-size: 24px; color: var(--val-red); }
 
-        .rank-img { width: 150px; filter: drop-shadow(0 0 15px var(--val-red)); }
-        .player-name { font-family: 'Oswald'; font-size: 32px; margin: 10px 0; }
+        /* Match History List with KDA */
+        .match-list { margin-top: 20px; }
+        .match-item { 
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr 1fr;
+            align-items: center; 
+            background: #161b22; margin-bottom: 10px; padding: 15px 25px; 
+            border-radius: 5px; border-left: 5px solid #333; transition: 0.3s;
+        }
+        .match-item.win { border-left-color: #00ff88; background: rgba(0, 255, 136, 0.05); }
+        .match-item.loss { border-left-color: #ff4655; background: rgba(255, 70, 85, 0.05); }
         
-        .win { color: #00ff88; }
-        .loss { color: #ff4655; }
-        
-        #loader { font-family: 'Oswald'; font-size: 24px; color: var(--val-red); text-align: center; margin-top: 100px; }
-        .back-btn { display: inline-block; margin-top: 30px; color: white; text-decoration: none; background: #333; padding: 10px 20px; border-radius: 5px; transition: 0.3s; }
-        .back-btn:hover { background: var(--val-red); }
+        .match-map { font-weight: bold; font-family: 'Oswald'; color: #ccc; text-transform: uppercase; }
+        .match-kda { font-family: 'Oswald'; font-size: 18px; text-align: center; }
+        .kda-label { font-size: 10px; color: #888; display: block; margin-top: -5px; }
+        .match-score { font-family: 'Oswald'; font-size: 18px; text-align: right; }
+        .match-result-text { font-family: 'Oswald'; letter-spacing: 1px; }
 
-        .header-title { font-family: 'Oswald'; letter-spacing: 2px; border-left: 4px solid var(--val-red); padding-left: 15px; text-align: left; margin-bottom: 20px; }
+        /* Recommendation Box */
+        .recommend-box { 
+            background: linear-gradient(45deg, #1f2326, #2c343a); 
+            padding: 20px; border-radius: 8px; border: 1px dashed var(--val-blue);
+            margin-bottom: 30px; display: flex; align-items: center; gap: 15px;
+        }
+
+        .header-title { font-family: 'Oswald'; letter-spacing: 2px; border-left: 4px solid var(--val-red); padding-left: 15px; text-align: left; margin-bottom: 20px; text-transform: uppercase; }
+        #loader { font-family: 'Oswald'; font-size: 24px; color: var(--val-red); text-align: center; margin-top: 100px; }
+        .back-btn { display: inline-block; margin-top: 30px; color: white; text-decoration: none; background: #333; padding: 10px 25px; border-radius: 5px; transition: 0.3s; font-family: 'Oswald'; }
+        .back-btn:hover { background: var(--val-red); }
     </style>
 </head>
 <body>
 
-    <div id="loader"> กำลังวิเคราะห์ 5 เกมล่าสุด...</div>
+    <div id="loader"> กำลังวิเคราะห์ๆ...</div>
 
     <div class="container" id="content" style="display: none;">
         <div class="result-card">
-            <p style="color: #888; margin: 0;">ACCOUNT OVERVIEW</p>
             <h1 class="player-name" id="resName">-</h1>
             <img id="resIcon" src="" class="rank-img">
             <div style="font-family: 'Oswald'; font-size: 28px;" id="resRank">-</div>
-            <div style="font-size: 18px; color: #ccc;">Current RR: <span id="resRR" style="color: white;">0</span></div>
+            <div style="font-size: 18px; color: #ccc;">RR: <span id="resRR" style="color: white;">0</span></div>
         </div>
 
-        <h3 class="header-title">PERFORMANCE (LAST 5 GAMES)</h3>
+        <div class="recommend-box" id="recBox">
+            <div style="font-size: 30px;">💡</div>
+            <div>
+                <b style="color: var(--val-blue);">NAMMON AI ADVICE:</b><br>
+                <span id="recText">กำลังประมวลผลสถิติสังหาร...</span>
+            </div>
+        </div>
+
+        <h3 class="header-title">Overall Stats (Last 5)</h3>
         <div class="stats-grid">
             <div class="stat-box">
-                <div class="stat-label">Win / Loss</div>
-                <div class="stat-value"><span id="winCount" class="win">0</span>W / <span id="lossCount" class="loss">0</span>L</div>
+                <div class="stat-label">Winrate</div>
+                <div class="stat-value" id="winRate">0%</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Most Used Agent</div>
-                <div class="stat-value" id="topAgent" style="color: white; font-size: 20px;">-</div>
+                <div class="stat-label">Avg K/D</div>
+                <div class="stat-value" id="avgKD">0.00</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Favorite Weapon</div>
-                <div class="stat-value" id="topWeapon" style="color: white; font-size: 20px;">-</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Avg. Damage</div>
-                <div class="stat-value" id="avgDmg">0</div>
+                <div class="stat-label">Main Agent</div>
+                <div class="stat-value" id="topAgent" style="font-size: 20px;">-</div>
             </div>
         </div>
 
+        <h3 class="header-title">Recent Matches (K/D/A)</h3>
+        <div class="match-list" id="matchList">
+            </div>
+
         <div style="text-align: center;">
-            <a href="index.html" class="back-btn">← SEARCH ANOTHER PLAYER</a>
+            <a href="index.html" class="back-btn">BACK TO HUB</a>
         </div>
     </div>
 
@@ -77,10 +106,10 @@
             if(!name || !tag) return;
 
             try {
-                const mmrRes = await fetch(`https://api.henrikdev.xyz/valorant/v1/mmr/ap/${name}/${tag}`, { headers: {'Authorization': API_KEY}});
+                const mmrRes = await fetch(`https://api.henrikdev.xyz/valorant/v1/mmr/ap/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`, { headers: {'Authorization': API_KEY}});
                 const mmrData = await mmrRes.json();
 
-                const matchRes = await fetch(`https://api.henrikdev.xyz/valorant/v3/matches/ap/${name}/${tag}?size=5`, { headers: {'Authorization': API_KEY}});
+                const matchRes = await fetch(`https://api.henrikdev.xyz/valorant/v3/matches/ap/${encodeURIComponent(name)}/${encodeURIComponent(tag)}?size=5`, { headers: {'Authorization': API_KEY}});
                 const matchData = await matchRes.json();
 
                 if (mmrData.status === 200 && matchData.status === 200) {
@@ -89,42 +118,66 @@
                     document.getElementById('resRR').innerText = mmrData.data.ranking_in_tier;
                     document.getElementById('resIcon').src = mmrData.data.images.large;
 
-                    let wins = 0, losses = 0, totalDmg = 0;
-                    let agents = {}, weapons = {};
+                    let wins = 0, totalKills = 0, totalDeaths = 0, agents = {};
+                    const matchList = document.getElementById('matchList');
+                    matchList.innerHTML = '';
 
                     matchData.data.forEach(match => {
                         const me = match.players.all_players.find(p => p.name.toLowerCase() === name.toLowerCase());
                         if(me) {
-                            agents[me.character] = (agents[me.character] || 0) + 1;
+                            const k = me.stats.kills;
+                            const d = me.stats.deaths;
+                            const a = me.stats.assists;
                             
-                            if(me.stats) totalDmg += me.stats.damage;
+                            totalKills += k;
+                            totalDeaths += d;
+                            agents[me.character] = (agents[me.character] || 0) + 1;
 
                             const myTeam = me.team.toLowerCase();
                             const won = match.teams[myTeam].has_won;
-                            if(won) wins++; else losses++;
+                            if(won) wins++;
+
+                            // สร้างแถบ Match พร้อม KDA
+                            const item = document.createElement('div');
+                            item.className = `match-item ${won ? 'win' : 'loss'}`;
+                            item.innerHTML = `
+                                <div class="match-result-text" style="color: ${won ? '#00ff88' : '#ff4655'}">${won ? 'WIN' : 'LOSS'}</div>
+                                <div class="match-map">${match.metadata.map}</div>
+                                <div class="match-kda">
+                                    ${k} / ${d} / ${a}
+                                    <span class="kda-label">KILLS / DEATHS / ASSISTS</span>
+                                </div>
+                                <div class="match-score">${match.teams.blue.rounds_won} - ${match.teams.red.rounds_won}</div>
+                            `;
+                            matchList.appendChild(item);
                         }
                     });
 
+                    // คำนวณภาพรวม
+                    const avgKD = totalDeaths > 0 ? (totalKills / totalDeaths).toFixed(2) : totalKills.toFixed(2);
+                    const winRatePercent = (wins / 5) * 100;
                     const favoriteAgent = Object.keys(agents).reduce((a, b) => agents[a] > agents[b] ? a : b);
 
-                    document.getElementById('winCount').innerText = wins;
-                    document.getElementById('lossCount').innerText = losses;
+                    document.getElementById('winRate').innerText = winRatePercent + "%";
+                    document.getElementById('avgKD').innerText = avgKD;
                     document.getElementById('topAgent').innerText = favoriteAgent;
-                    document.getElementById('avgDmg').innerText = Math.round(totalDmg / 5).toLocaleString();
-                     
-                    document.getElementById('topWeapon').innerText = "VANDAL"; 
+
+                    // AI Advice ตาม K/D
+                    let advice = "";
+                    if(avgKD >= 1.2) advice = `โหดจัดดด K/D สูงถึง ${avgKD} ระดับ Radiant ไม่ไกลเกินเอื้อม`;
+                    else if(avgKD < 1.0) advice = `K/D ต่ำกว่า 1.0 คนเราผิดพลาดกันได้ เอาใหม่`;
+                    else advice = `ได้อยู่นะ ถ้าไม่ติดเล่น คือโหดจัด`;
+                    document.getElementById('recText').innerText = advice;
 
                     document.getElementById('loader').style.display = "none";
                     document.getElementById('content').style.display = "block";
                 } else {
-                    document.getElementById('loader').innerText = "❌ PLAYER DATA IS PRIVATE OR NOT FOUND";
+                    document.getElementById('loader').innerText = "❌ PRIVATE ACCOUNT OR ERROR";
                 }
             } catch (err) {
-                document.getElementById('loader').innerText = "❌ ERROR FETCHING DATA";
-                console.error(err);
+                document.getElementById('loader').innerText = "❌ FETCHING FAILED";
             }
         }
-
         fetchDetailedData();
     </script>
 </body>
