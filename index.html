@@ -10,7 +10,6 @@
         * { box-sizing: border-box; scroll-behavior: smooth; }
         body { margin: 0; background-color: var(--val-black); color: var(--val-white); font-family: 'Kanit', sans-serif; overflow: hidden; }
 
-        /* ระบบพื้นหลังสลับรูป */
         #bg-slideshow {
             position: fixed;
             top: 0;
@@ -20,11 +19,10 @@
             z-index: -1;
             background-size: cover;
             background-position: center;
-            transition: background-image 1.5s ease-in-out; /* ความนุ่มนวลตอนสลับรูป */
-            filter: brightness(0.4); /* ปรับให้มืดลงเล็กน้อยเพื่อให้ตัวหนังสือเด่น */
+            transition: background-image 1.5s ease-in-out; 
+            filter: brightness(0.4); 
         }
 
-        /* Overlay เลเยอร์สีดำไล่เฉด */
         .overlay {
             position: fixed;
             top: 0;
@@ -69,13 +67,12 @@
                     <input type="text" id="pName" placeholder="ชื่อผู้เล่น (เช่น TenZ)">
                     <input type="text" id="pTag" placeholder="Tag" style="max-width: 100px;">
                 </div>
-                <button class="val-btn" onclick="goToResult()">ANALYZE RANK</button>
+                <button class="val-btn" onclick="goToResult()">วิเคราะห์แรงค์</button>
             </div>
         </div>
     </div>
 
     <script>
-        // รายชื่อรูปภาพ Agent (ใช้รูปจาก Official Riot)
         const images = [
             'https://static.invenglobal.com/upload/image/2020/04/02/i1585819016848035.jpeg',
             'https://news.codashop.com/th/wp-content/uploads/sites/9/2023/04/VALO-Reyna-Agent-Guide-.jpg',
@@ -87,13 +84,11 @@
         let currentIndex = 0;
         const bgElement = document.getElementById('bg-slideshow');
 
-        // ฟังก์ชันเปลี่ยนรูป
         function changeBackground() {
             bgElement.style.backgroundImage = `url('${images[currentIndex]}')`;
             currentIndex = (currentIndex + 1) % images.length;
         }
 
-        // เริ่มต้นทำงานทันทีและสลับทุกๆ 5 วินาที
         changeBackground();
         setInterval(changeBackground, 5000);
 

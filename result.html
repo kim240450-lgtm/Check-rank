@@ -11,7 +11,6 @@
         .container { max-width: 900px; margin: 0 auto; }
         .result-card { background: var(--val-gray); padding: 40px; border-radius: 10px; border-top: 4px solid var(--val-red); margin-bottom: 20px; text-align: center; }
         
-        /* Stats Grid */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
         .stat-box { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,70,85,0.2); }
         .stat-label { color: #888; font-size: 14px; text-transform: uppercase; }
@@ -32,7 +31,7 @@
 </head>
 <body>
 
-    <div id="loader">⚡ ANALYZING LAST 5 MATCHES...</div>
+    <div id="loader"> กำลังวิเคราะห์ 5 เกมล่าสุด รอดิบอม...</div>
 
     <div class="container" id="content" style="display: none;">
         <div class="result-card">
@@ -78,55 +77,42 @@
             if(!name || !tag) return;
 
             try {
-                // 1. ดึงข้อมูลแรงค์ปัจจุบัน
                 const mmrRes = await fetch(`https://api.henrikdev.xyz/valorant/v1/mmr/ap/${name}/${tag}`, { headers: {'Authorization': API_KEY}});
                 const mmrData = await mmrRes.json();
 
-                // 2. ดึงประวัติการเล่น 5 เกมล่าสุด
                 const matchRes = await fetch(`https://api.henrikdev.xyz/valorant/v3/matches/ap/${name}/${tag}?size=5`, { headers: {'Authorization': API_KEY}});
                 const matchData = await matchRes.json();
 
                 if (mmrData.status === 200 && matchData.status === 200) {
-                    // --- ประมวลผลข้อมูลทั่วไป ---
                     document.getElementById('resName').innerText = `${name} #${tag}`;
                     document.getElementById('resRank').innerText = mmrData.data.currenttierpatched;
                     document.getElementById('resRR').innerText = mmrData.data.ranking_in_tier;
                     document.getElementById('resIcon').src = mmrData.data.images.large;
 
-                    // --- วิเคราะห์ประวัติการเล่น ---
                     let wins = 0, losses = 0, totalDmg = 0;
                     let agents = {}, weapons = {};
 
                     matchData.data.forEach(match => {
-                        // หาข้อมูลของผู้เล่นเราในเกมนั้น
                         const me = match.players.all_players.find(p => p.name.toLowerCase() === name.toLowerCase());
                         if(me) {
-                            // นับเอเจนต์
                             agents[me.character] = (agents[me.character] || 0) + 1;
                             
-                            // นับปืน (จาก Kill แรกที่ทำได้ในสถิติ หรือสรุปจากดาเมจ)
-                            // ใน API ฟรี ข้อมูลปืนจะอยู่ในส่วน stats ของแต่ละแมตช์
                             if(me.stats) totalDmg += me.stats.damage;
 
-                            // เช็คว่าชนะหรือแพ้
                             const myTeam = me.team.toLowerCase();
                             const won = match.teams[myTeam].has_won;
                             if(won) wins++; else losses++;
                         }
                     });
 
-                    // หาตัวละครที่เล่นบ่อยที่สุด
                     const favoriteAgent = Object.keys(agents).reduce((a, b) => agents[a] > agents[b] ? a : b);
 
-                    // อัปเดต UI สถิติ
                     document.getElementById('winCount').innerText = wins;
                     document.getElementById('lossCount').innerText = losses;
                     document.getElementById('topAgent').innerText = favoriteAgent;
                     document.getElementById('avgDmg').innerText = Math.round(totalDmg / 5).toLocaleString();
-                    
-                    // หมายเหตุ: ปืนที่ใช้บ่อยที่สุดมักต้องดึงจากข้อมูลการ Kill ซึ่ง API บางตัวอาจจำกัด 
-                    // ในที่นี้ผมขอใส่เป็น "วิเคราะห์จากดาเมจ" หรือค่าคงที่ไว้ก่อนเพื่อให้เห็นภาพ
-                    document.getElementById('topWeapon').innerText = "VANDAL"; // ตัวอย่าง
+                     
+                    document.getElementById('topWeapon').innerText = "VANDAL"; 
 
                     document.getElementById('loader').style.display = "none";
                     document.getElementById('content').style.display = "block";
