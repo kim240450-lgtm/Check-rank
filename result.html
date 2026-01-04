@@ -2,73 +2,84 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Detailed Analysis | Check Rank</title>
+    <title>Detailed Analysis | Nammon Gaming</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --val-red: #ff4655; --val-black: #0f1923; --val-gray: #1f2326; --val-blue: #00eeff; }
-        body { margin: 0; background: var(--val-black); color: white; font-family: 'Kanit', sans-serif; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
+        :root { --val-red: #ff4655; --val-black: #0f1923; --val-blue: #00eeff; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--val-black); color: white; font-family: 'Kanit', sans-serif; overflow-x: hidden; }
+
+        /* พื้นหลัง Dynamic */
+        #bg-image {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; object-fit: cover;
+            filter: brightness(0.3) blur(1px);
+            transition: opacity 1s ease-in-out;
+        }
+
+        .video-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 20%, var(--val-black) 100%);
+            z-index: -1;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 1; }
         
-        /* Account Card */
-        .result-card { background: var(--val-gray); padding: 40px; border-radius: 10px; border-top: 4px solid var(--val-red); margin-bottom: 20px; text-align: center; }
+        .result-card, .stat-box, .match-item, .recommend-box { 
+            background: rgba(15, 25, 35, 0.7) !important; 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .result-card { padding: 40px; border-top: 4px solid var(--val-red); margin-bottom: 20px; text-align: center; }
         .rank-img { width: 140px; filter: drop-shadow(0 0 15px var(--val-red)); }
-        .player-name { font-family: 'Oswald'; font-size: 32px; margin: 10px 0; text-transform: uppercase; }
+        .player-name { font-family: 'Oswald'; font-size: 36px; margin: 10px 0; text-transform: uppercase; }
 
-        /* Stats Grid */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .stat-label { color: #888; font-size: 12px; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-value { font-family: 'Oswald'; font-size: 24px; color: var(--val-red); }
+        .stat-box { padding: 20px; text-align: center; }
+        .stat-label { color: #aaa; font-size: 12px; text-transform: uppercase; }
+        .stat-value { font-family: 'Oswald'; font-size: 26px; color: var(--val-red); }
 
-        /* Match History List with KDA */
         .match-list { margin-top: 20px; }
         .match-item { 
-            display: grid;
-            grid-template-columns: 1fr 1fr 1.5fr 1fr;
-            align-items: center; 
-            background: #161b22; margin-bottom: 10px; padding: 15px 25px; 
-            border-radius: 5px; border-left: 5px solid #333; transition: 0.3s;
+            display: grid; grid-template-columns: 1fr 1fr 1.5fr 1fr;
+            align-items: center; margin-bottom: 12px; padding: 15px 25px; border-left: 5px solid #333;
         }
-        .match-item.win { border-left-color: #00ff88; background: rgba(0, 255, 136, 0.05); }
-        .match-item.loss { border-left-color: #ff4655; background: rgba(255, 70, 85, 0.05); }
+        .match-item.win { border-left-color: #00ff88; }
+        .match-item.loss { border-left-color: #ff4655; }
         
         .match-map { font-weight: bold; font-family: 'Oswald'; color: #ccc; text-transform: uppercase; }
-        .match-kda { font-family: 'Oswald'; font-size: 18px; text-align: center; }
-        .kda-label { font-size: 10px; color: #888; display: block; margin-top: -5px; }
-        .match-score { font-family: 'Oswald'; font-size: 18px; text-align: right; }
-        .match-result-text { font-family: 'Oswald'; letter-spacing: 1px; }
+        .match-kda { font-family: 'Oswald'; font-size: 20px; text-align: center; }
+        .match-score { font-family: 'Oswald'; font-size: 20px; text-align: right; }
 
-        /* Recommendation Box */
-        .recommend-box { 
-            background: linear-gradient(45deg, #1f2326, #2c343a); 
-            padding: 20px; border-radius: 8px; border: 1px dashed var(--val-blue);
-            margin-bottom: 30px; display: flex; align-items: center; gap: 15px;
-        }
-
+        .recommend-box { padding: 20px; border: 1px dashed var(--val-blue); margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
         .header-title { font-family: 'Oswald'; letter-spacing: 2px; border-left: 4px solid var(--val-red); padding-left: 15px; text-align: left; margin-bottom: 20px; text-transform: uppercase; }
-        #loader { font-family: 'Oswald'; font-size: 24px; color: var(--val-red); text-align: center; margin-top: 100px; }
-        .back-btn { display: inline-block; margin-top: 30px; color: white; text-decoration: none; background: #333; padding: 10px 25px; border-radius: 5px; transition: 0.3s; font-family: 'Oswald'; }
+        
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--val-black); display: flex; justify-content: center; align-items: center; z-index: 999; font-family: 'Oswald'; font-size: 24px; color: var(--val-red); }
+        .back-btn { display: inline-block; margin-top: 30px; color: white; text-decoration: none; background: rgba(255,46,85,0.2); padding: 12px 30px; border-radius: 5px; font-family: 'Oswald'; border: 1px solid var(--val-red); }
         .back-btn:hover { background: var(--val-red); }
     </style>
 </head>
 <body>
 
-    <div id="loader"> กำลังวิเคราะห์ๆ...</div>
+    <img id="bg-image" src="https://media.tenor.com/fSbe_mN-v64AAAAd/valorant-jett.gif" alt="background">
+    <div class="video-overlay"></div>
+
+    <div id="loader">⚡ ANALYZING COMBAT DATA...</div>
 
     <div class="container" id="content" style="display: none;">
         <div class="result-card">
             <h1 class="player-name" id="resName">-</h1>
             <img id="resIcon" src="" class="rank-img">
-            <div style="font-family: 'Oswald'; font-size: 28px;" id="resRank">-</div>
-            <div style="font-size: 18px; color: #ccc;">RR: <span id="resRR" style="color: white;">0</span></div>
+            <div style="font-family: 'Oswald'; font-size: 32px;" id="resRank">-</div>
+            <div style="font-size: 18px; color: #ccc;">Current RR: <span id="resRR" style="color: var(--val-blue);">0</span></div>
         </div>
 
-        <div class="recommend-box" id="recBox">
-            <div style="font-size: 30px;">💡</div>
-            <div>
-                <b style="color: var(--val-blue);">NAMMON AI ADVICE:</b><br>
-                <span id="recText">กำลังประมวลผลสถิติสังหาร...</span>
-            </div>
+        <div class="recommend-box">
+            <div style="font-size: 35px;">💡</div>
+            <div><b style="color: var(--val-blue); font-family: 'Oswald';">NAMMON AI ADVICE</b><br><span id="recText">ประมวลผล...</span></div>
         </div>
 
         <h3 class="header-title">Overall Stats (Last 5)</h3>
@@ -78,25 +89,50 @@
                 <div class="stat-value" id="winRate">0%</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Avg K/D</div>
+                <div class="stat-label">Avg K/D Ratio</div>
                 <div class="stat-value" id="avgKD">0.00</div>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Main Agent</div>
-                <div class="stat-value" id="topAgent" style="font-size: 20px;">-</div>
+                <div class="stat-value" id="topAgent" style="font-size: 22px;">-</div>
             </div>
         </div>
 
         <h3 class="header-title">Recent Matches (K/D/A)</h3>
-        <div class="match-list" id="matchList">
-            </div>
+        <div class="match-list" id="matchList"></div>
 
         <div style="text-align: center;">
-            <a href="index.html" class="back-btn">BACK TO HUB</a>
+            <a href="index.html" class="back-btn">BACK TO TRACKER</a>
         </div>
     </div>
 
     <script>
+        // --- ส่วนที่เก็บลิงก์ GIF ของแต่ละ Agent ---
+        const agentBgs = {
+            "Omen": "https://media1.tenor.com/m/gXZNSfLz1oIAAAAd/casting-paranoia-omen.gif",
+            "Gekko": "https://media1.tenor.com/m/wFIs-MGVge8AAAAd/ready-to-fight-gekko.gif",
+            "Phoenix": "https://media1.tenor.com/m/ALrncBgxe5AAAAAC/throwing-fire-ball-phoenix.gif",
+            "Reyna": "https://i.pinimg.com/originals/83/c5/e3/83c5e3d2d9ab4a60926b407a7fe5d8dc.gif",
+            "Sova":"https://media1.tenor.com/m/Kb8T-ovodmkAAAAd/shooting-the-arrow-sova.gif",
+            "Jett":"https://i.pinimg.com/originals/7f/8d/5f/7f8d5ff419fabb57ae53e84822a93d97.gif",
+            "Sage":"https://media1.tenor.com/m/V4tnmWFCzwwAAAAd/using-power-sage.gif",
+            "Deadlock":"https://media1.tenor.com/m/BTEh3zyx30kAAAAd/nods-deadlock.gif",
+            "Iso":"https://media1.tenor.com/m/9qL9xVg8bQIAAAAC/shooting-iso.gif",
+            "Yoru": "https://media1.tenor.com/m/yXP6zzQEUnQAAAAd/firing-yoru.gif",
+            "Viper": "https://media1.tenor.com/m/R73g0XKmBzQAAAAd/reload-viper.gif",
+            "Brimstone": "https://media1.tenor.com/m/CvNM8mNpr3YAAAAd/ready-to-shoot-brimstone.gif",
+            "Breach": "https://media1.tenor.com/m/SyWdxSGs2DQAAAAd/screaming-breach.gif",
+            "Fade": "https://media1.tenor.com/m/upE4lq-omZwAAAAd/haunt-fade.gif",
+            "Kay O": "https://media1.tenor.com/m/Yht1tydy354AAAAd/shooting-kay-o.gif",
+            "Chamber": "https://media1.tenor.com/m/8XzUmzJ0UVoAAAAd/take-aim-sentinel.gif",
+            "Astra": "https://media1.tenor.com/m/yMJqekwzYukAAAAd/astral-form-astra.gif",
+            "Neon": "https://media1.tenor.com/m/y46MPGi4f3wAAAAd/electric-eyes-neon.gif",
+            "Clove": "https://i.pinimg.com/originals/96/e2/1b/96e21b696951775d7fffef9de0b88ef6.gif",
+            "Raze": "https://media1.tenor.com/m/yMJqekwzYukAAAAd/astral-form-astra.gif",
+            "Killjoy": "https://media1.tenor.com/m/9RN75wdiGoMAAAAd/on-my-way-killjoy.gif",
+            "default": "https://i.pinimg.com/originals/7f/8d/5f/7f8d5ff419fabb57ae53e84822a93d97.gif"
+        };
+
         const API_KEY = "HDEV-7ee27c84-96b2-46d1-b705-c10ccb330267";
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name');
@@ -104,11 +140,9 @@
 
         async function fetchDetailedData() {
             if(!name || !tag) return;
-
             try {
                 const mmrRes = await fetch(`https://api.henrikdev.xyz/valorant/v1/mmr/ap/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`, { headers: {'Authorization': API_KEY}});
                 const mmrData = await mmrRes.json();
-
                 const matchRes = await fetch(`https://api.henrikdev.xyz/valorant/v3/matches/ap/${encodeURIComponent(name)}/${encodeURIComponent(tag)}?size=5`, { headers: {'Authorization': API_KEY}});
                 const matchData = await matchRes.json();
 
@@ -125,58 +159,34 @@
                     matchData.data.forEach(match => {
                         const me = match.players.all_players.find(p => p.name.toLowerCase() === name.toLowerCase());
                         if(me) {
-                            const k = me.stats.kills;
-                            const d = me.stats.deaths;
-                            const a = me.stats.assists;
-                            
-                            totalKills += k;
-                            totalDeaths += d;
+                            const k = me.stats.kills, d = me.stats.deaths, a = me.stats.assists;
+                            totalKills += k; totalDeaths += d;
                             agents[me.character] = (agents[me.character] || 0) + 1;
-
-                            const myTeam = me.team.toLowerCase();
-                            const won = match.teams[myTeam].has_won;
+                            const won = match.teams[me.team.toLowerCase()].has_won;
                             if(won) wins++;
 
-                            // สร้างแถบ Match พร้อม KDA
                             const item = document.createElement('div');
                             item.className = `match-item ${won ? 'win' : 'loss'}`;
-                            item.innerHTML = `
-                                <div class="match-result-text" style="color: ${won ? '#00ff88' : '#ff4655'}">${won ? 'WIN' : 'LOSS'}</div>
-                                <div class="match-map">${match.metadata.map}</div>
-                                <div class="match-kda">
-                                    ${k} / ${d} / ${a}
-                                    <span class="kda-label">KILLS / DEATHS / ASSISTS</span>
-                                </div>
-                                <div class="match-score">${match.teams.blue.rounds_won} - ${match.teams.red.rounds_won}</div>
-                            `;
+                            item.innerHTML = `<div class="match-result-text" style="color: ${won ? '#00ff88' : '#ff4655'}">${won ? 'WIN' : 'LOSS'}</div><div class="match-map">${match.metadata.map}</div><div class="match-kda">${k}/${d}/${a}</div><div class="match-score">${match.teams.blue.rounds_won}-${match.teams.red.rounds_won}</div>`;
                             matchList.appendChild(item);
                         }
                     });
 
-                    // คำนวณภาพรวม
-                    const avgKD = totalDeaths > 0 ? (totalKills / totalDeaths).toFixed(2) : totalKills.toFixed(2);
-                    const winRatePercent = (wins / 5) * 100;
+                    // หา Main Agent และเปลี่ยนพื้นหลัง
                     const favoriteAgent = Object.keys(agents).reduce((a, b) => agents[a] > agents[b] ? a : b);
+                    const bgImg = document.getElementById('bg-image');
+                    bgImg.src = agentBgs[favoriteAgent] || agentBgs["default"];
 
-                    document.getElementById('winRate').innerText = winRatePercent + "%";
+                    const avgKD = (totalKills / (totalDeaths || 1)).toFixed(2);
+                    document.getElementById('winRate').innerText = (wins/5*100) + "%";
                     document.getElementById('avgKD').innerText = avgKD;
                     document.getElementById('topAgent').innerText = favoriteAgent;
-
-                    // AI Advice ตาม K/D
-                    let advice = "";
-                    if(avgKD >= 1.2) advice = `โหดจัดดด K/D สูงถึง ${avgKD} ระดับ Radiant ไม่ไกลเกินเอื้อม`;
-                    else if(avgKD < 1.0) advice = `K/D ต่ำกว่า 1.0 คนเราผิดพลาดกันได้ เอาใหม่`;
-                    else advice = `ได้อยู่นะ ถ้าไม่ติดเล่น คือโหดจัด`;
-                    document.getElementById('recText').innerText = advice;
+                    document.getElementById('recText').innerText = avgKD >= 1.1 ? `ฟอร์มดีมาก! เล่น ${favoriteAgent} ได้ดุดันสุดๆ` : `ลองเน้นจังหวะ Support เพื่อนด้วย ${favoriteAgent} ดูครับ`;
 
                     document.getElementById('loader').style.display = "none";
                     document.getElementById('content').style.display = "block";
-                } else {
-                    document.getElementById('loader').innerText = "❌ PRIVATE ACCOUNT OR ERROR";
                 }
-            } catch (err) {
-                document.getElementById('loader').innerText = "❌ FETCHING FAILED";
-            }
+            } catch (err) { document.getElementById('loader').innerText = "❌ เกิดข้อผิดพลาด"; }
         }
         fetchDetailedData();
     </script>
