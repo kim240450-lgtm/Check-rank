@@ -9,7 +9,6 @@
         * { box-sizing: border-box; }
         body { margin: 0; background: var(--val-black); color: white; font-family: 'Kanit', sans-serif; overflow-x: hidden; }
 
-        /* พื้นหลัง Dynamic */
         #bg-image {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -26,11 +25,39 @@
 
         .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 1; }
         
-        .result-card, .stat-box, .match-item, .recommend-box { 
+        .result-card, .stat-box, .match-item { 
             background: rgba(15, 25, 35, 0.7) !important; 
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
+        }
+
+        @keyframes rgb-border {
+            0% { border-color: #ff4655; box-shadow: 0 0 15px rgba(255, 70, 85, 0.4); }
+            33% { border-color: #00eeff; box-shadow: 0 0 15px rgba(0, 238, 255, 0.4); }
+            66% { border-color: #ff00ff; box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); }
+            100% { border-color: #ff4655; box-shadow: 0 0 15px rgba(255, 70, 85, 0.4); }
+        }
+
+        .recommend-box { 
+            padding: 20px; 
+            background: rgba(15, 25, 35, 0.85) !important;
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--val-blue); 
+            border-radius: 10px;
+            margin-bottom: 30px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            animation: rgb-border 3s linear infinite; 
+        }
+
+        .advice-header {
+            font-family: 'Oswald';
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: var(--val-blue);
+            margin-bottom: 4px;
         }
 
         .result-card { padding: 40px; border-top: 4px solid var(--val-red); margin-bottom: 20px; text-align: center; }
@@ -54,7 +81,6 @@
         .match-kda { font-family: 'Oswald'; font-size: 20px; text-align: center; }
         .match-score { font-family: 'Oswald'; font-size: 20px; text-align: right; }
 
-        .recommend-box { padding: 20px; border: 1px dashed var(--val-blue); margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
         .header-title { font-family: 'Oswald'; letter-spacing: 2px; border-left: 4px solid var(--val-red); padding-left: 15px; text-align: left; margin-bottom: 20px; text-transform: uppercase; }
         
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--val-black); display: flex; justify-content: center; align-items: center; z-index: 999; font-family: 'Oswald'; font-size: 24px; color: var(--val-red); }
@@ -64,10 +90,10 @@
 </head>
 <body>
 
-    <img id="bg-image" src="https://media.tenor.com/fSbe_mN-v64AAAAd/valorant-jett.gif" alt="background">
+    <img id="bg-image" src="https://i.pinimg.com/originals/7f/8d/5f/7f8d5ff419fabb57ae53e84822a93d97.gif" alt="background">
     <div class="video-overlay"></div>
 
-    <div id="loader">กำลังวิเคราะห์...</div>
+    <div id="loader"> กำลังวิเคราะห์...</div>
 
     <div class="container" id="content" style="display: none;">
         <div class="result-card">
@@ -78,9 +104,15 @@
         </div>
 
         <div class="recommend-box">
-            <div style="font-size: 35px;">💡</div>
-            <div><b style="color: var(--val-blue); font-family: 'Oswald';">NAMMON AI ADVICE</b><br><span id="recText">ประมวลผล...</span></div>
-        </div>
+    <img src="mypic.png.png" 
+         alt="Nammon AI" 
+         style="width: 65px; height: 65px; border-radius: 12px; filter: drop-shadow(0 0 5px var(--val-blue)); object-fit: cover; border: 2px solid rgba(255,255,255,0.2);">
+    
+    <div>
+        <div class="advice-header">NAMMON AI ANALYST</div>
+        <span id="recText">กำลังประมวลผลข้อมูลของคุณ...</span>
+    </div>
+</div>
 
         <h3 class="header-title">Overall Stats (Last 5)</h3>
         <div class="stats-grid">
@@ -107,7 +139,6 @@
     </div>
 
     <script>
-        // --- ส่วนที่เก็บลิงก์ GIF ของแต่ละ Agent ---
         const agentBgs = {
             "Omen": "https://media1.tenor.com/m/gXZNSfLz1oIAAAAd/casting-paranoia-omen.gif",
             "Gekko": "https://media1.tenor.com/m/wFIs-MGVge8AAAAd/ready-to-fight-gekko.gif",
@@ -128,7 +159,7 @@
             "Astra": "https://media1.tenor.com/m/yMJqekwzYukAAAAd/astral-form-astra.gif",
             "Neon": "https://media1.tenor.com/m/y46MPGi4f3wAAAAd/electric-eyes-neon.gif",
             "Clove": "https://i.pinimg.com/originals/96/e2/1b/96e21b696951775d7fffef9de0b88ef6.gif",
-            "Raze": "https://media1.tenor.com/m/yMJqekwzYukAAAAd/astral-form-astra.gif",
+            "Raze": "https://media.tenor.com/8pCPySZScZkAAAAM/matching-pfp-valorant.gif", 
             "Killjoy": "https://media1.tenor.com/m/9RN75wdiGoMAAAAd/on-my-way-killjoy.gif",
             "default": "https://i.pinimg.com/originals/7f/8d/5f/7f8d5ff419fabb57ae53e84822a93d97.gif"
         };
@@ -137,6 +168,24 @@
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name');
         const tag = params.get('tag');
+
+        function getSmartAdvice(kd, wr, agent) {
+            const duelists = ["Jett", "Reyna", "Raze", "Phoenix", "Neon", "Yoru", "Iso"];
+            const isDuelist = duelists.includes(agent);
+            let text = "";
+
+            if (kd >= 1.2) {
+                text = `โหดเกินนนนน! K/D ${kd} ตัวแบกประจำทีมชัดๆ `;
+                text += isDuelist ? `เล่น ${agent} ได้โหดจัดดด Entry สวยๆ แบบนี้ทีมชนะชัว` : `ขนาดเล่น ${agent} คุณยังเก็บได้เยอะขนาดนี้ เก่งมากครับ`;
+            } else if (kd >= 0.9) {
+                text = `ฟอร์มนิ่งจัด K/D ${kd} งั้นๆ `;
+                text += wr >= 60 ? `พอได้ Winrate ${wr}% ตึงอยู่!` : `คุยกับเพื่อนในทีมเยอะๆหาข้อมูล`;
+            } else {
+                text = `ฟอร์มตก (K/D ${kd}) `;
+                text += isDuelist ? `วางเป้าดีๆ และใจเย็นๆ ${agent}` : `เน้นใช้สกิลของ ${agent} ช่วยเพื่อนจะทำให้เล่นง่าย`;
+            }
+            return text;
+        }
 
         async function fetchDetailedData() {
             if(!name || !tag) return;
@@ -172,21 +221,23 @@
                         }
                     });
 
-                    // หา Main Agent และเปลี่ยนพื้นหลัง
                     const favoriteAgent = Object.keys(agents).reduce((a, b) => agents[a] > agents[b] ? a : b);
                     const bgImg = document.getElementById('bg-image');
                     bgImg.src = agentBgs[favoriteAgent] || agentBgs["default"];
 
                     const avgKD = (totalKills / (totalDeaths || 1)).toFixed(2);
-                    document.getElementById('winRate').innerText = (wins/5*100) + "%";
+                    const winRatePercent = (wins/5*100);
+
+                    document.getElementById('winRate').innerText = winRatePercent + "%";
                     document.getElementById('avgKD').innerText = avgKD;
                     document.getElementById('topAgent').innerText = favoriteAgent;
-                    document.getElementById('recText').innerText = avgKD >= 1.1 ? `โหดจัดดดด เล่น ${favoriteAgent} เก่งว่ะ` : `หาเน้นจังหวะ Support เพื่อนด้วย ${favoriteAgent} ดูครับ`;
+                    
+                    document.getElementById('recText').innerText = getSmartAdvice(avgKD, winRatePercent, favoriteAgent);
 
                     document.getElementById('loader').style.display = "none";
                     document.getElementById('content').style.display = "block";
                 }
-            } catch (err) { document.getElementById('loader').innerText = "❌ เกิดข้อผิดพลาด"; }
+            } catch (err) { document.getElementById('loader').innerText = "❌ เกิดข้อผิดพลาดในการดึงข้อมูล"; }
         }
         fetchDetailedData();
     </script>
